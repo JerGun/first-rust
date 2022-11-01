@@ -41,6 +41,16 @@ impl MongoRepo {
         Ok(user)
     }
 
+    pub fn get_all_users(&self) -> Result<Vec<User>, Error> {
+        let cursors = self
+            .col
+            .find(None, None)
+            .ok()
+            .expect("Error getting list of users");
+        let users = cursors.map(|doc| doc.unwrap()).collect();
+        Ok(users)
+    }
+
     pub fn get_user(&self, id: &String) -> Result<User, Error> {
         let obj_id = ObjectId::parse_str(id).unwrap();
         let filter = doc! {"_id": obj_id};

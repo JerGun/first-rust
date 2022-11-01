@@ -10,7 +10,7 @@ use std::io::{BufWriter, Write};
 
 #[macro_use]
 extern crate rocket;
-use api::user_api::{create_user, delete_user, get_user, update_user};
+use api::user_api::{create_user, delete_user, get_all_users, get_user, update_user};
 use repository::mongodb_repo::MongoRepo;
 use rocket::{get, http::Status, serde::json::Json};
 
@@ -22,10 +22,13 @@ fn index() -> Result<Json<String>, Status> {
 #[launch]
 fn rocket() -> _ {
     let db = MongoRepo::init();
-    rocket::build().manage(db).mount(
-        "/user",
-        routes![create_user, get_user, update_user, delete_user],
-    )
+    rocket::build()
+        .manage(db)
+        .mount(
+            "/user",
+            routes![create_user, get_user, update_user, delete_user],
+        )
+        .mount("/users", routes![get_all_users])
 }
 
 fn login() {
