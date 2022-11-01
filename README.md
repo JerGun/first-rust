@@ -1,5 +1,10 @@
 # Rust API
-API build for practice rust
+API build for practice rust 🚀
+
+### Technologies
+- Rocket
+- Jsonwebtoken
+- MongoDB
 
 Run Command
 ```
