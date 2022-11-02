@@ -1,6 +1,33 @@
-use crate::{models::user_model::User, repository::mongodb_repo::MongoRepo};
-use mongodb::{bson::oid::ObjectId, results::InsertOneResult};
+use crate::{
+    models::user_model::User,
+    repository::user_repo::{CreateUserRequest, MongoRepo},
+};
+use mongodb::results::InsertOneResult;
+use rand::Rng;
 use rocket::{http::Status, serde::json::Json, State};
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize)]
+pub struct NonceResponse {
+    nonce: i32,
+}
+
+#[get("/<address>")]
+pub fn random_nonce(db: &State<MongoRepo>, address: String) -> Result<Json<NonceResponse>, Status> {
+    let mut rng = rand::thread_rng();
+    let nonce = rng.gen_range(0..9999999);
+    let user = db.get_user_by_address(&address.to_owned());
+    if user.unwrap().is_none() {
+        let data = CreateUserRequest {
+            address: address.to_owned(),
+            nonce: nonce,
+        };
+        db.create_user_with_nonce(data);
+    } else {
+        db.update_nonce(&address, nonce.to_string());
+    }
+    Ok(Json(NonceResponse { nonce: nonce }))
+}
 
 #[post("/", data = "<new_user>")]
 pub fn create_user(
@@ -9,9 +36,11 @@ pub fn create_user(
 ) -> Result<Json<InsertOneResult>, Status> {
     let data = User {
         id: None,
-        username: new_user.username.to_owned(),
-        img: new_user.img.to_owned(),
+        username: None,
+        profile: None,
+        banner: None,
         address: new_user.address.to_owned(),
+        nonce: new_user.nonce.to_owned(),
     };
     let user_detail = db.create_user(data);
     match user_detail {
@@ -35,7 +64,7 @@ pub fn get_user(db: &State<MongoRepo>, path: String) -> Result<Json<User>, Statu
     if id.is_empty() {
         return Err(Status::BadRequest);
     };
-    let user_detail = db.get_user(&id);
+    let user_detail = db.get_user_by_id(&id);
     match user_detail {
         Ok(user) => Ok(Json(user)),
         Err(_) => Err(Status::InternalServerError),
@@ -54,15 +83,17 @@ pub fn update_user(
     };
     let data = User {
         id: None,
-        username: new_user.username.to_owned(),
-        img: new_user.img.to_owned(),
+        username: None,
+        profile: new_user.profile.to_owned(),
+        banner: new_user.banner.to_owned(),
         address: new_user.address.to_owned(),
+        nonce: None,
     };
     let update_result = db.update_user(&id, data);
     match update_result {
         Ok(update) => {
             if update.matched_count == 1 {
-                let updated_user_info = db.get_user(&id);
+                let updated_user_info = db.get_user_by_id(&id);
                 return match updated_user_info {
                     Ok(user) => Ok(Json(user)),
                     Err(_) => Err(Status::InternalServerError),
