@@ -2776,6 +2776,7 @@ dependencies = [
  "dotenv",
  "jwt-simple",
  "mongodb",
+ "rand 0.8.5",
  "rocket",
  "serde",
 ]
