@@ -1,9 +1,9 @@
 use crate::{
+    helper::generate_nonce,
     models::user_model::User,
-    repository::user_repo::{CreateUserRequest, MongoRepo},
+    repository::mongodb_repo::{CreateUserRequest, MongoRepo},
 };
 use mongodb::results::InsertOneResult;
-use rand::Rng;
 use rocket::{http::Status, serde::json::Json, State};
 use serde::{Deserialize, Serialize};
 
@@ -14,8 +14,8 @@ pub struct NonceResponse {
 
 #[get("/<address>")]
 pub fn random_nonce(db: &State<MongoRepo>, address: String) -> Result<Json<NonceResponse>, Status> {
-    let mut rng = rand::thread_rng();
-    let nonce = rng.gen_range(0..9999999);
+    let nonce = generate_nonce();
+    let nonce = generate_nonce();
     let user = db.get_user_by_address(&address.to_owned());
     if user.unwrap().is_none() {
         let data = CreateUserRequest {
@@ -24,7 +24,7 @@ pub fn random_nonce(db: &State<MongoRepo>, address: String) -> Result<Json<Nonce
         };
         db.create_user_with_nonce(data);
     } else {
-        db.update_nonce(&address, nonce.to_string());
+        db.update_nonce(&address, nonce);
     }
     Ok(Json(NonceResponse { nonce: nonce }))
 }
