@@ -9,9 +9,6 @@ API build for practice implementing api using rust language 🚀
 - Rocket
 - Jsonwebtoken
 - MongoDB
-
-</br>
-
 ### Install Rust
 All you need to do on Unix systems like Linux and macOS is open a terminal and type this:
 ```
@@ -19,7 +16,11 @@ $ curl https://sh.rustup.rs -sSf | sh
 ```
 Installing on Windows is nearly as easy: download and run [rustup-init.exe](https://win.rustup.rs/). It will start the installation in a console and present the above message on success.
 
-</br>
+**Visual Studio Code Extensions**
+- [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+- [Better TOML](https://marketplace.visualstudio.com/items?itemName=bungcip.better-toml)
+- [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)
+- [crates](https://marketplace.visualstudio.com/items?itemName=serayuzgur.crates)
 
 ### Run Command
 ```
