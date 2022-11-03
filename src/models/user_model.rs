@@ -9,7 +9,7 @@ pub struct User {
     pub profile: Option<String>,
     pub banner: Option<String>,
     pub address: String,
-    pub nonce: Option<i32>,
+    pub nonce: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -18,4 +18,14 @@ pub struct CreateUser {
     pub id: Option<ObjectId>,
     pub address: String,
     pub nonce: Option<i32>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UpdateUser {
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    pub id: Option<ObjectId>,
+    pub username: String,
+    pub profile: String,
+    pub banner: String,
+    pub address: String,
 }

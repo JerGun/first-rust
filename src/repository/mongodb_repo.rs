@@ -2,7 +2,7 @@ use std::env;
 extern crate dotenv;
 use dotenv::dotenv;
 
-use crate::models::user_model::User;
+use crate::models::user_model::{User, UpdateUser};
 use mongodb::{
     bson::{doc, extjson::de::Error, oid::ObjectId},
     results::{DeleteResult, InsertOneResult, UpdateResult},
@@ -41,7 +41,7 @@ impl MongoRepo {
             profile: None,
             banner: None,
             address: new_user.address,
-            nonce: Some(new_user.nonce),
+            nonce: new_user.nonce,
         };
         let user = self
             .col
@@ -99,7 +99,7 @@ impl MongoRepo {
         Ok(user_detail)
     }
 
-    pub fn update_user(&self, id: &String, new_user: User) -> Result<UpdateResult, Error> {
+    pub fn update_user(&self, id: &String, new_user: UpdateUser) -> Result<UpdateResult, Error> {
         let obj_id = ObjectId::parse_str(id).unwrap();
         let filter = doc! {"_id": obj_id};
         let new_doc = doc! {
