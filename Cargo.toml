@@ -12,6 +12,9 @@ dotenv = "0.15.0"
 jwt-simple = "0.11.2"
 serde = "1.0.147"
 rand = "0.8.5"
+ethsign = "0.8.0"
+hex= "0.4.3"
+web3 ="0.18.0"
 
 [dependencies.mongodb]
 version = "2.2.0"
