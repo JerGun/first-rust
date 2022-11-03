@@ -1,9 +1,11 @@
-mod api;
+mod controllers;
+mod cors;
 mod helper;
 mod jwt_sign;
 mod models;
 mod repository;
 
+use crate::cors::CORS;
 use jwt_sign::create_jwt;
 use jwt_simple::prelude::*;
 use rocket::{http::Status, serde::json::Json};
@@ -12,7 +14,9 @@ use std::io::{BufWriter, Write};
 
 #[macro_use]
 extern crate rocket;
-use api::user_api::{create_user, delete_user, get_all_users, get_user, random_nonce, update_user};
+use controllers::user_controller::{
+    create_user, delete_user, get_all_users, get_user, random_nonce, update_user, verify_signature,
+};
 use repository::mongodb_repo::MongoRepo;
 
 #[get("/")]
@@ -24,6 +28,7 @@ fn index() -> Result<Json<String>, Status> {
 fn rocket() -> _ {
     let db = MongoRepo::init();
     rocket::build()
+        .attach(CORS)
         .manage(db)
         .mount("/", routes![index])
         .mount(
@@ -32,6 +37,7 @@ fn rocket() -> _ {
         )
         .mount("/users", routes![get_all_users])
         .mount("/users/nonce", routes![random_nonce])
+        .mount("/verifySignature", routes![verify_signature])
 }
 
 fn login() {
